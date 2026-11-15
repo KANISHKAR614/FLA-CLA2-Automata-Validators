@@ -39,7 +39,7 @@ FLA-CLA2-Automata-Validators/
 ## Quick start
 
 ```bash
-git clone https://github.com/<your-username>/FLA-CLA2-Automata-Validators.git
+git clone https://github.com/<KANISHKAR614>/FLA-CLA2-Automata-Validators.git
 cd FLA-CLA2-Automata-Validators
 python3 -m unittest discover -s tests -t .      # 37 tests, a few seconds
 ```
