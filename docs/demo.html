@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Finite-automata validators - live demo</title>
+<style>
+  :root { --bg:#f7f8fa; --card:#fff; --ink:#1b2430; --mute:#6b7685; --ok:#137a3f; --bad:#b42318; --line:#dde2ea; --accent:#1d4e89; }
+  @media (prefers-color-scheme: dark) { :root { --bg:#12161c; --card:#1a2029; --ink:#e7ebf1; --mute:#93a0b2; --ok:#4cc38a; --bad:#ff7b72; --line:#2b3441; --accent:#6aa7ff; } }
+  body { margin:0; font:15px/1.5 system-ui, sans-serif; background:var(--bg); color:var(--ink); }
+  header { background:var(--accent); color:#fff; padding:14px 20px; }
+  header h1 { margin:0; font-size:18px; } header p { margin:2px 0 0; opacity:.85; font-size:13px; }
+  main { max-width:880px; margin:0 auto; padding:16px; display:grid; gap:14px; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:14px 16px; }
+  select, input { font:inherit; padding:8px 10px; border:1px solid var(--line); border-radius:6px; background:var(--bg); color:var(--ink); width:100%; box-sizing:border-box; }
+  input { font-family:ui-monospace, Menlo, monospace; }
+  .verdict { margin-top:10px; padding:8px 10px; border-radius:6px; font-weight:600; }
+  .ok { background:color-mix(in srgb, var(--ok) 15%, transparent); color:var(--ok); }
+  .bad { background:color-mix(in srgb, var(--bad) 15%, transparent); color:var(--bad); }
+  .ex button { margin:2px 4px 2px 0; padding:3px 8px; border:1px solid var(--line); border-radius:12px; background:var(--bg); color:var(--ink); cursor:pointer; font:12px ui-monospace, monospace; }
+  .ex button.good { border-color:var(--ok); } .ex button.badx { border-color:var(--bad); }
+  table { border-collapse:collapse; width:100%; font:13px ui-monospace, monospace; }
+  th, td { text-align:left; padding:3px 8px; border-bottom:1px solid var(--line); }
+  .trap { color:var(--bad); }
+  small { color:var(--mute); }
+</style>
+</head>
+<body>
+<header><h1>Finite-automata validators - live demo</h1><p>21CSC301T Formal Language and Automata - CLA-2 Task 2</p></header>
+<main>
+  <div class="card">
+    <label for="app"><small>Application</small></label>
+    <select id="app"></select>
+    <label for="txt" style="display:block;margin-top:10px"><small>Input string</small></label>
+    <input id="txt" autocomplete="off" spellcheck="false">
+    <div id="verdict" class="verdict"></div>
+    <div class="ex" id="ex" style="margin-top:10px"></div>
+  </div>
+  <div class="card"><small>Transition trace (the trap state qD is shown in red)</small>
+    <table id="trace"><thead><tr><th>#</th><th>state</th><th>char</th><th>class</th><th>next</th></tr></thead><tbody></tbody></table>
+  </div>
+</main>
+<script>
+const TABLES = {"mobile": {"name": "Indian mobile number", "start": "q0", "accepting": ["q13"], "trap": "qD", "alphabet": ["P", "Z", "N1", "L2", "N9", "H6", "O"], "states": ["q0", "q1", "q2", "q3", "q4", "q5", "q6", "q7", "q8", "q9", "q10", "q11", "q12", "q13", "qD"], "delta": {"q0|P": "q1", "q0|Z": "q3", "q0|N9": "q4", "q0|H6": "q4", "q1|N9": "q2", "q2|N1": "q3", "q3|N9": "q4", "q3|H6": "q4", "q4|Z": "q5", "q4|N1": "q5", "q4|L2": "q5", "q4|N9": "q5", "q4|H6": "q5", "q5|Z": "q6", "q5|N1": "q6", "q5|L2": "q6", "q5|N9": "q6", "q5|H6": "q6", "q6|Z": "q7", "q6|N1": "q7", "q6|L2": "q7", "q6|N9": "q7", "q6|H6": "q7", "q7|Z": "q8", "q7|N1": "q8", "q7|L2": "q8", "q7|N9": "q8", "q7|H6": "q8", "q8|Z": "q9", "q8|N1": "q9", "q8|L2": "q9", "q8|N9": "q9", "q8|H6": "q9", "q9|Z": "q10", "q9|N1": "q10", "q9|L2": "q10", "q9|N9": "q10", "q9|H6": "q10", "q10|Z": "q11", "q10|N1": "q11", "q10|L2": "q11", "q10|N9": "q11", "q10|H6": "q11", "q11|Z": "q12", "q11|N1": "q12", "q11|L2": "q12", "q11|N9": "q12", "q11|H6": "q12", "q12|Z": "q13", "q12|N1": "q13", "q12|L2": "q13", "q12|N9": "q13", "q12|H6": "q13"}}, "vehicle": {"name": "Vehicle registration", "start": "q0", "accepting": ["q10"], "trap": "qD", "alphabet": ["U", "D", "O"], "states": ["q0", "q1", "q2", "q3", "q4", "q5", "q6", "q7", "q8", "q9", "q10", "qD"], "delta": {"q0|U": "q1", "q1|U": "q2", "q2|D": "q3", "q3|D": "q4", "q4|U": "q5", "q5|U": "q6", "q5|D": "q7", "q6|D": "q7", "q7|D": "q8", "q8|D": "q9", "q9|D": "q10"}}, "dob": {"name": "Date of birth DD/MM/YYYY", "start": "q0", "accepting": ["q14"], "trap": "qD", "alphabet": ["D0", "D1", "D2", "D3", "D49", "S", "O"], "states": ["q0", "q1", "q2", "q3", "q4", "q5", "q6", "q7", "q8", "q9", "q10", "q11", "q12", "q14", "qD"], "delta": {"q0|D0": "q1", "q0|D1": "q2", "q0|D2": "q2", "q0|D3": "q3", "q1|D1": "q4", "q1|D2": "q4", "q1|D3": "q4", "q1|D49": "q4", "q2|D0": "q4", "q2|D1": "q4", "q2|D2": "q4", "q2|D3": "q4", "q2|D49": "q4", "q3|D0": "q4", "q3|D1": "q4", "q4|S": "q5", "q5|D0": "q6", "q5|D1": "q7", "q6|D1": "q8", "q6|D2": "q8", "q6|D3": "q8", "q6|D49": "q8", "q7|D0": "q8", "q7|D1": "q8", "q7|D2": "q8", "q8|S": "q9", "q9|D0": "q10", "q9|D1": "q10", "q9|D2": "q10", "q9|D3": "q10", "q9|D49": "q10", "q10|D0": "q11", "q10|D1": "q11", "q10|D2": "q11", "q10|D3": "q11", "q10|D49": "q11", "q11|D0": "q12", "q11|D1": "q12", "q11|D2": "q12", "q11|D3": "q12", "q11|D49": "q12", "q12|D0": "q14", "q12|D1": "q14", "q12|D2": "q14", "q12|D3": "q14", "q12|D49": "q14"}}};
+const CLASSIFY = {
+  mobile: c => c === "+" ? "P" : c === "0" ? "Z" : c === "1" ? "N1" : "2345".includes(c) ? "L2" : c === "9" ? "N9" : "678".includes(c) ? "H6" : "O",
+  vehicle: c => (c >= "A" && c <= "Z") ? "U" : (c >= "0" && c <= "9") ? "D" : "O",
+  dob: c => ({"0":"D0","1":"D1","2":"D2","3":"D3","/":"S"})[c] || ("456789".includes(c) ? "D49" : "O"),
+};
+const NAMES = { mobile: "Indian mobile number", vehicle: "Vehicle registration number", dob: "Date of birth DD/MM/YYYY" };
+const EXAMPLES = {
+  mobile: [["9876543210",1],["+919876543210",1],["08123456789",1],["5876543210",0],["+929876543210",0],["98765432105",0]],
+  vehicle: [["TN45AB1234",1],["DL01C9999",1],["MH12P4567",1],["TN45ABC1234",0],["T45AB1234",0],["TN45AB123",0]],
+  dob: [["15/08/1947",1],["29/02/2024",1],["31/12/2026",1],["32/01/2026",0],["15/13/2026",0],["15-08-2026",0]],
+};
+const $ = id => document.getElementById(id);
+const app = $("app"), txt = $("txt");
+for (const k of Object.keys(TABLES)) app.add(new Option(NAMES[k], k));
+
+function run() {
+  const key = app.value, dfa = TABLES[key];
+  let state = dfa.start;
+  const rows = [];
+  [...txt.value].forEach((ch, i) => {
+    const cls = CLASSIFY[key](ch);
+    const next = dfa.delta[state + "|" + cls] || dfa.trap;
+    rows.push([i + 1, state, ch, cls, next]);
+    state = next;
+  });
+  const ok = dfa.accepting.includes(state);
+  const v = $("verdict");
+  v.className = "verdict " + (ok ? "ok" : "bad");
+  v.textContent = (ok ? "ACCEPTED" : "REJECTED") + " - final state " + state;
+  const body = $("trace").tBodies[0];
+  body.innerHTML = "";
+  for (const r of rows) {
+    const tr = body.insertRow();
+    r.forEach((c, j) => { const td = tr.insertCell(); td.textContent = c; if (c === dfa.trap) td.className = "trap"; });
+  }
+}
+function examples() {
+  const box = $("ex"); box.innerHTML = "";
+  for (const [s, good] of EXAMPLES[app.value]) {
+    const b = document.createElement("button");
+    b.textContent = s; b.className = good ? "good" : "badx";
+    b.onclick = () => { txt.value = s; run(); };
+    box.appendChild(b);
+  }
+}
+app.onchange = () => { txt.value = EXAMPLES[app.value][0][0]; examples(); run(); };
+txt.oninput = run;
+app.onchange();
+</script>
+</body>
+</html>

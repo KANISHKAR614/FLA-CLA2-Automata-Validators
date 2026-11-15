@@ -1,0 +1,30 @@
+digraph "JSON structure validator" {
+  rankdir=LR;
+  node [shape=circle, fontname="Helvetica"];
+  __start [shape=point];
+  __start -> "q0";
+  "q0" [shape=circle];
+  "qobj0" [shape=circle];
+  "qkey" [shape=circle];
+  "qval" [shape=circle];
+  "qarr0" [shape=circle];
+  "qafter" [shape=circle];
+  "qobj_next" [shape=circle];
+  "qf" [shape=doublecircle];
+  "q0" -> "qobj0" [label="{, Z0 / BZ0", fontsize=9];
+  "q0" -> "qarr0" [label="[, Z0 / KZ0", fontsize=9];
+  "qobj0" -> "qafter" [label="}, B / ε", fontsize=9];
+  "qobj0" -> "qkey" [label="k, B / B", fontsize=9];
+  "qobj_next" -> "qkey" [label="k, B / B", fontsize=9];
+  "qkey" -> "qval" [label=":, B / B", fontsize=9];
+  "qarr0" -> "qafter" [label="], K / ε\nv, K / K", fontsize=9];
+  "qarr0" -> "qobj0" [label="{, K / BK", fontsize=9];
+  "qarr0" -> "qarr0" [label="[, K / KK", fontsize=9];
+  "qval" -> "qafter" [label="v, B / B\nv, K / K", fontsize=9];
+  "qval" -> "qobj0" [label="{, B / BB\n{, K / BK", fontsize=9];
+  "qval" -> "qarr0" [label="[, B / KB\n[, K / KK", fontsize=9];
+  "qafter" -> "qobj_next" [label=",, B / B", fontsize=9];
+  "qafter" -> "qval" [label=",, K / K", fontsize=9];
+  "qafter" -> "qafter" [label="], K / ε\n}, B / ε", fontsize=9];
+  "qafter" -> "qf" [label="ε, Z0 / Z0", fontsize=9];
+}

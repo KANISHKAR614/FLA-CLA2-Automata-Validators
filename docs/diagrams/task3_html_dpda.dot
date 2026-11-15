@@ -1,0 +1,13 @@
+digraph "HTML tag matcher" {
+  rankdir=LR;
+  node [shape=circle, fontname="Helvetica"];
+  __start [shape=point];
+  __start -> "q0";
+  "q0" [shape=circle];
+  "q1" [shape=circle];
+  "qf" [shape=doublecircle];
+  "q0" -> "q1" [label="bo, Z0 / BZ0\nio, Z0 / IZ0\npo, Z0 / PZ0", fontsize=9];
+  "q1" -> "q1" [label="bc, B / ε\nbo, B / BB\nbo, I / BI\nbo, P / BP\nic, I / ε\nio, B / IB\nio, I / II\nio, P / IP\npc, P / ε\npo, B / PB\npo, I / PI\npo, P / PP", fontsize=9];
+  "qf" -> "q1" [label="bo, Z0 / BZ0\nio, Z0 / IZ0\npo, Z0 / PZ0", fontsize=9];
+  "q1" -> "qf" [label="ε, Z0 / Z0", fontsize=9];
+}

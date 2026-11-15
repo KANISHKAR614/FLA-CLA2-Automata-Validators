@@ -1,0 +1,12 @@
+digraph "G_stmt (top-down PDA)" {
+  rankdir=LR;
+  node [shape=circle, fontname="Helvetica"];
+  __start [shape=point];
+  __start -> "q0";
+  "q0" [shape=circle];
+  "q1" [shape=circle];
+  "qf" [shape=doublecircle];
+  "q0" -> "q1" [label="ε, Z0 / SZ0", fontsize=9];
+  "q1" -> "q1" [label="(, ( / ε\n), ) / ε\n;, ; / ε\nC, C / ε\na, a / ε\nelse, else / ε\nif, if / ε\nwhile, while / ε\n{, { / ε\n}, } / ε\nε, L / S\nε, L / S;L\nε, M / a\nε, M / if(C)MelseM\nε, M / while(C)M\nε, M / {L}\nε, S / M\nε, S / U\nε, U / if(C)MelseU\nε, U / if(C)S\nε, U / while(C)U", fontsize=9];
+  "q1" -> "qf" [label="ε, Z0 / Z0", fontsize=9];
+}
